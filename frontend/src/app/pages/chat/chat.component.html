@@ -1,0 +1,56 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Posez une question sur vos articles</mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="question-input">
+      <mat-form-field appearance="outline" style="width: 100%;">
+        <mat-label>Votre question</mat-label>
+        <input
+          matInput
+          [formControl]="questionControl"
+          placeholder="Ex: Comment fonctionne l'attention dans les Transformers?"
+          (keyup.enter)="askQuestion()">
+      </mat-form-field>
+
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="askQuestion()"
+        [disabled]="loading">
+        <mat-icon>send</mat-icon>
+        Poser la question
+      </button>
+    </div>
+
+    <div *ngIf="loading" class="loading">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Recherche en cours...</p>
+    </div>
+
+    <div *ngIf="error" class="error">
+      <mat-icon color="warn">error</mat-icon>
+      <p>{{ error }}</p>
+    </div>
+
+    <div *ngIf="answer" class="answer-section">
+      <h3>Réponse:</h3>
+      <div class="answer-box">
+        {{ answer }}
+      </div>
+
+      <div *ngIf="sources.length > 0" class="sources-section">
+        <h3>Sources:</h3>
+        <mat-card *ngFor="let source of sources; let i = index" class="source-card">
+          <mat-card-content>
+            <p><strong>[{{ i + 1 }}] {{ source.paper_title }}</strong> ({{ source.paper_year }})</p>
+            <p class="section">Section: {{ source.section_name }}</p>
+            <p class="content">{{ source.content }}</p>
+            <p class="relevance">Pertinence: {{ (source.relevance_score * 100).toFixed(0) }}%</p>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

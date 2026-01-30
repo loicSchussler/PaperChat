@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # PostgreSQL avec extension pgvector
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: paperchat_db
+    environment:
+      POSTGRES_USER: paperchat
+      POSTGRES_PASSWORD: paperchat123
+      POSTGRES_DB: paperchat_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U paperchat"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Backend FastAPI
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: paperchat_backend
+    environment:
+      DATABASE_URL: postgresql://paperchat:paperchat123@db:5432/paperchat_db
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-SECRET_REMOVED}
+      OPENAI_API_BASE: ${OPENAI_API_BASE:-https://api.mammouth.ai/v1}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - ./uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  postgres_data:

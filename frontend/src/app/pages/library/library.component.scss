@@ -1,0 +1,28 @@
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+
+  mat-icon {
+    font-size: 72px;
+    width: 72px;
+    height: 72px;
+    color: #999;
+  }
+
+  p {
+    font-size: 18px;
+    color: #666;
+    margin: 20px 0;
+  }
+}
+
+table {
+  width: 100%;
+  margin-top: 20px;
+}

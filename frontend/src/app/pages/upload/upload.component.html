@@ -1,0 +1,61 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Upload un article scientifique</mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="upload-container">
+      <input
+        type="file"
+        #fileInput
+        accept="application/pdf"
+        (change)="onFileSelected($event)"
+        style="display: none">
+
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="fileInput.click()"
+        [disabled]="uploading">
+        <mat-icon>upload_file</mat-icon>
+        Choisir un fichier PDF
+      </button>
+
+      <div *ngIf="selectedFile" class="file-info">
+        <p>Fichier sélectionné: {{ selectedFile.name }}</p>
+        <button
+          mat-raised-button
+          color="accent"
+          (click)="onUpload()"
+          [disabled]="uploading">
+          <mat-icon>cloud_upload</mat-icon>
+          Upload et indexer
+        </button>
+      </div>
+
+      <div *ngIf="uploading" class="loading">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Upload en cours...</p>
+      </div>
+
+      <div *ngIf="uploadSuccess" class="success">
+        <mat-icon color="primary">check_circle</mat-icon>
+        <p>Upload réussi!</p>
+      </div>
+
+      <div *ngIf="uploadError" class="error">
+        <mat-icon color="warn">error</mat-icon>
+        <p>{{ uploadError }}</p>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <h3>Instructions:</h3>
+      <ul>
+        <li>Sélectionnez un fichier PDF (max 10 MB)</li>
+        <li>Le système extraira automatiquement les métadonnées</li>
+        <li>Le document sera découpé et indexé pour la recherche</li>
+      </ul>
+    </div>
+  </mat-card-content>
+</mat-card>
