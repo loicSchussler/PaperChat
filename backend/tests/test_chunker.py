@@ -1,8 +1,7 @@
 """
 Unit tests for text chunking service
 """
-import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 from app.services.chunker import chunk_text
 
 

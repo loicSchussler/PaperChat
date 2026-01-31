@@ -2,7 +2,7 @@
 Unit tests for vector search service
 """
 import pytest
-from unittest.mock import Mock, MagicMock, patch
+from unittest.mock import Mock
 from app.services.vector_store import vector_search
 
 

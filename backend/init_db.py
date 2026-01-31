@@ -7,7 +7,6 @@ import time
 from pathlib import Path
 from sqlalchemy import text
 from app.database import engine, Base
-from app.models import Paper, Chunk, QueryLog
 
 def wait_for_db(max_retries=30, retry_interval=1):
     """Attendre que la base de données soit prête"""

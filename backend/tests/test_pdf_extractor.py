@@ -1,7 +1,6 @@
 """
 Unit tests for PDF text extraction service
 """
-import pytest
 from unittest.mock import Mock, patch, MagicMock
 from app.services.pdf_extractor import extract_text_from_pdf
 

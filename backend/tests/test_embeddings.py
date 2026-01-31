@@ -2,7 +2,7 @@
 Unit tests for embeddings generation service
 """
 import pytest
-from unittest.mock import Mock, patch, AsyncMock, MagicMock
+from unittest.mock import Mock, patch, AsyncMock
 from app.services.embeddings import generate_embedding, generate_embeddings_batch
 
 

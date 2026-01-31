@@ -99,11 +99,9 @@ async def get_conversation(
     for msg in messages:
         sources = None
         if msg.sources:
-            try:
-                sources_data = json.loads(msg.sources)
-                sources = [SourceCitation(**src) for src in sources_data]
-            except:
-                pass
+            sources_data = json.loads(msg.sources)
+            sources = [SourceCitation(**src) for src in sources_data]
+            
 
         formatted_messages.append(MessageResponse(
             id=msg.id,

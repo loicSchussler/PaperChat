@@ -21,7 +21,7 @@ async def get_stats(db: Session = Depends(get_db)):
     avg_response_time = db.query(func.avg(models.QueryLog.response_time_ms)).scalar() or 0.0
 
     # Queries today
-    from datetime import datetime, timedelta
+    from datetime import datetime
     today = datetime.now().date()
     queries_today = db.query(func.count(models.QueryLog.id)).filter(
         func.date(models.QueryLog.created_at) == today

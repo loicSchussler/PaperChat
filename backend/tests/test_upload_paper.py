@@ -2,12 +2,9 @@
 Unit tests for upload_paper endpoint
 """
 import pytest
-from unittest.mock import Mock, patch, AsyncMock, MagicMock
+from unittest.mock import Mock, patch, AsyncMock
 from fastapi import UploadFile
 from io import BytesIO
-from pathlib import Path
-import tempfile
-import os
 
 
 class TestUploadPaperEndpoint:
@@ -113,7 +110,7 @@ class TestUploadPaperEndpoint:
         with patch('app.api.papers.models.Paper', return_value=mock_paper):
             with patch('app.api.papers.models.Chunk'):
                 # Execute
-                result = await upload_paper(mock_pdf_file, mock_db)
+                await upload_paper(mock_pdf_file, mock_db)
 
                 # Assert - verify all services were called
                 assert mock_extract_text.called
@@ -313,7 +310,7 @@ class TestUploadPaperEndpoint:
             with patch('app.api.papers.models.Paper', return_value=mock_paper):
                 with patch('app.api.papers.models.Chunk'):
                     # Execute
-                    result = await upload_paper(mock_pdf_file, mock_db)
+                    await upload_paper(mock_pdf_file, mock_db)
 
                     # Assert - paper created with defaults
                     assert mock_db.add.called
@@ -373,7 +370,7 @@ class TestUploadPaperEndpoint:
         with patch('app.api.papers.models.Paper', return_value=mock_paper):
             with patch('app.api.papers.models.Chunk', side_effect=mock_chunk_init):
                 # Execute
-                result = await upload_paper(mock_pdf_file, mock_db)
+                await upload_paper(mock_pdf_file, mock_db)
 
                 # Assert - correct number of chunks created
                 assert len(chunk_records) == len(sample_chunks)
