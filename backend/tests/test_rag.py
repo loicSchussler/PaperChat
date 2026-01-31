@@ -3,7 +3,7 @@ Unit tests for RAG service
 """
 import pytest
 from unittest.mock import Mock, AsyncMock, patch
-from app.services.rag import generate_rag_answer, calculate_cost, _build_context, _deduplicate_sources
+from app.services.rag import generate_rag_answer_with_context, calculate_cost, _build_context, _deduplicate_sources
 
 
 class TestGenerateRagAnswer:
@@ -52,9 +52,10 @@ class TestGenerateRagAnswer:
         mock_client.chat.completions.create = AsyncMock(return_value=mock_response)
 
         # Execute
-        result = await generate_rag_answer(
+        result = await generate_rag_answer_with_context(
             db=mock_db,
             question="What is machine learning?",
+            conversation_history=[],
             max_sources=5
         )
 
@@ -109,9 +110,10 @@ class TestGenerateRagAnswer:
         mock_client.chat.completions.create = AsyncMock(return_value=mock_response)
 
         # Execute with paper_ids
-        result = await generate_rag_answer(
+        result = await generate_rag_answer_with_context(
             db=mock_db,
             question="Test question",
+            conversation_history=[],
             max_sources=3,
             paper_ids=[1, 2, 3]
         )
@@ -144,9 +146,10 @@ class TestGenerateRagAnswer:
         mock_client.chat.completions.create = AsyncMock(return_value=mock_response)
 
         # Execute
-        result = await generate_rag_answer(
+        result = await generate_rag_answer_with_context(
             db=mock_db,
             question="Completely unrelated question",
+            conversation_history=[],
             max_sources=5
         )
 
@@ -168,9 +171,10 @@ class TestGenerateRagAnswer:
 
         # Execute & Assert
         with pytest.raises(Exception, match="Embedding API failed"):
-            await generate_rag_answer(
+            await generate_rag_answer_with_context(
                 db=mock_db,
                 question="Test question",
+                conversation_history=[],
                 max_sources=5
             )
 
@@ -194,9 +198,10 @@ class TestGenerateRagAnswer:
 
         # Execute & Assert
         with pytest.raises(Exception, match="LLM API failed"):
-            await generate_rag_answer(
+            await generate_rag_answer_with_context(
                 db=mock_db,
                 question="Test question",
+                conversation_history=[],
                 max_sources=5
             )
 
@@ -219,9 +224,10 @@ class TestGenerateRagAnswer:
         mock_client.chat.completions.create = AsyncMock(return_value=mock_response)
 
         # Execute
-        result = await generate_rag_answer(
+        result = await generate_rag_answer_with_context(
             db=mock_db,
             question="Test",
+            conversation_history=[],
             max_sources=5
         )
 
@@ -248,9 +254,10 @@ class TestGenerateRagAnswer:
         mock_client.chat.completions.create = AsyncMock(return_value=mock_response)
 
         # Execute
-        result = await generate_rag_answer(
+        result = await generate_rag_answer_with_context(
             db=mock_db,
             question="Test",
+            conversation_history=[],
             max_sources=5
         )
 
@@ -300,9 +307,10 @@ class TestGenerateRagAnswer:
         mock_client.chat.completions.create = capture_create_call
 
         # Execute
-        await generate_rag_answer(
+        await generate_rag_answer_with_context(
             db=mock_db,
             question="Test question",
+            conversation_history=[],
             max_sources=5
         )
 
@@ -345,9 +353,10 @@ class TestGenerateRagAnswer:
         mock_client.chat.completions.create = AsyncMock(return_value=mock_response)
 
         # Execute
-        result = await generate_rag_answer(
+        result = await generate_rag_answer_with_context(
             db=mock_db,
             question="Test",
+            conversation_history=[],
             max_sources=5
         )
 

@@ -17,33 +17,6 @@ client = AsyncOpenAI(
 )
 
 
-async def generate_rag_answer(
-    db: Session,
-    question: str,
-    max_sources: int = 5,
-    paper_ids: list = None
-) -> Dict[str, Any]:
-    """
-    Complete RAG pipeline to answer a question (without conversation context)
-
-    Args:
-        db: Database session
-        question: User's question
-        max_sources: Maximum number of sources to use
-        paper_ids: Paper IDs to filter the search
-
-    Returns:
-        Dict with answer, sources, cost_usd, response_time_ms
-    """
-    return await generate_rag_answer_with_context(
-        db=db,
-        question=question,
-        conversation_history=[],
-        max_sources=max_sources,
-        paper_ids=paper_ids
-    )
-
-
 async def generate_rag_answer_with_context(
     db: Session,
     question: str,
