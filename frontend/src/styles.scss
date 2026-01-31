@@ -14,3 +14,57 @@ body {
 * {
   box-sizing: border-box;
 }
+
+// Mobile dialog styles
+.mobile-dialog {
+  .mat-mdc-dialog-container {
+    padding: 0 !important;
+    border-radius: 0 !important;
+  }
+}
+
+// Responsive utilities
+@media (max-width: 768px) {
+  // Reduce padding on Material cards
+  .mat-mdc-card {
+    margin: 8px 0 !important;
+  }
+
+  // Adjust button sizes
+  .mat-mdc-button,
+  .mat-mdc-raised-button {
+    font-size: 14px !important;
+  }
+
+  // Smaller icons on mobile
+  .mat-icon {
+    &:not(.loading-icon) {
+      font-size: 20px !important;
+      width: 20px !important;
+      height: 20px !important;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  // Further reduce spacing
+  .mat-mdc-card-content {
+    padding: 12px !important;
+  }
+
+  // Smaller buttons
+  .mat-mdc-button,
+  .mat-mdc-raised-button {
+    font-size: 13px !important;
+    padding: 0 12px !important;
+  }
+
+  // Even smaller icons
+  .mat-icon {
+    &:not(.loading-icon) {
+      font-size: 18px !important;
+      width: 18px !important;
+      height: 18px !important;
+    }
+  }
+}

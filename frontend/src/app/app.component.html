@@ -1,22 +1,38 @@
-<mat-toolbar color="primary">
-  <span>{{ title }}</span>
+<mat-toolbar color="primary" class="app-toolbar">
+  <span class="app-title">{{ title }}</span>
   <span class="spacer"></span>
-  <button mat-button routerLink="/upload">
-    <mat-icon>upload_file</mat-icon>
-    Upload
-  </button>
-  <button mat-button routerLink="/library">
-    <mat-icon>library_books</mat-icon>
-    Library
-  </button>
-  <button mat-button routerLink="/chat">
-    <mat-icon>chat</mat-icon>
-    Chat
-  </button>
-  <button mat-button routerLink="/dashboard">
-    <mat-icon>dashboard</mat-icon>
-    Dashboard
-  </button>
+  <nav class="desktop-nav">
+    <button mat-button routerLink="/upload">
+      <mat-icon>upload_file</mat-icon>
+      <span class="nav-label">Upload</span>
+    </button>
+    <button mat-button routerLink="/library">
+      <mat-icon>library_books</mat-icon>
+      <span class="nav-label">Library</span>
+    </button>
+    <button mat-button routerLink="/chat">
+      <mat-icon>chat</mat-icon>
+      <span class="nav-label">Chat</span>
+    </button>
+    <button mat-button routerLink="/dashboard">
+      <mat-icon>dashboard</mat-icon>
+      <span class="nav-label">Dashboard</span>
+    </button>
+  </nav>
+  <nav class="mobile-nav">
+    <button mat-icon-button routerLink="/upload" matTooltip="Upload">
+      <mat-icon>upload_file</mat-icon>
+    </button>
+    <button mat-icon-button routerLink="/library" matTooltip="Library">
+      <mat-icon>library_books</mat-icon>
+    </button>
+    <button mat-icon-button routerLink="/chat" matTooltip="Chat">
+      <mat-icon>chat</mat-icon>
+    </button>
+    <button mat-icon-button routerLink="/dashboard" matTooltip="Dashboard">
+      <mat-icon>dashboard</mat-icon>
+    </button>
+  </nav>
 </mat-toolbar>
 
 <div class="container">

@@ -1,54 +1,78 @@
-<mat-card>
-  <mat-card-header>
-    <mat-card-title>Bibliothèque d'articles ({{ papers.length }} papers)</mat-card-title>
-  </mat-card-header>
+<div class="library-container">
+  <div class="library-header">
+    <h1>Bibliothèque d'articles</h1>
+    <span class="paper-count">{{ papers.length }} document(s)</span>
+  </div>
 
-  <mat-card-content>
-    <div *ngIf="loading" class="loading-container">
-      <mat-spinner></mat-spinner>
-    </div>
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner></mat-spinner>
+  </div>
 
-    <div *ngIf="!loading && papers.length === 0" class="empty-state">
-      <mat-icon>library_books</mat-icon>
-      <p>Aucun article indexé. Commencez par uploader un PDF!</p>
-      <button mat-raised-button color="primary" routerLink="/upload">
-        <mat-icon>upload_file</mat-icon>
-        Upload un article
-      </button>
-    </div>
+  <div *ngIf="!loading && papers.length === 0" class="empty-state">
+    <mat-icon>library_books</mat-icon>
+    <p>Aucun article indexé. Commencez par uploader un PDF!</p>
+    <button mat-raised-button color="primary" routerLink="/upload">
+      <mat-icon>upload_file</mat-icon>
+      Upload un article
+    </button>
+  </div>
 
-    <table mat-table [dataSource]="papers" *ngIf="!loading && papers.length > 0">
-      <ng-container matColumnDef="title">
-        <th mat-header-cell *matHeaderCellDef>Titre</th>
-        <td mat-cell *matCellDef="let paper">{{ paper.title }}</td>
-      </ng-container>
+  <div class="papers-grid" *ngIf="!loading && papers.length > 0">
+    <mat-card class="paper-card" *ngFor="let paper of papers" (click)="openPdfViewer(paper)">
+      <div class="card-preview">
+        <mat-icon class="pdf-icon">picture_as_pdf</mat-icon>
+        <div class="preview-overlay">
+          <mat-icon>visibility</mat-icon>
+          <span>Voir le PDF</span>
+        </div>
+      </div>
 
-      <ng-container matColumnDef="authors">
-        <th mat-header-cell *matHeaderCellDef>Auteurs</th>
-        <td mat-cell *matCellDef="let paper">{{ paper.authors?.join(', ') || '-' }}</td>
-      </ng-container>
+      <mat-card-content>
+        <h3 class="paper-title">{{ paper.title }}</h3>
 
-      <ng-container matColumnDef="year">
-        <th mat-header-cell *matHeaderCellDef>Année</th>
-        <td mat-cell *matCellDef="let paper">{{ paper.year || '-' }}</td>
-      </ng-container>
+        <div class="paper-meta">
+          <div class="authors" *ngIf="paper.authors && paper.authors.length > 0">
+            <mat-icon class="meta-icon">people</mat-icon>
+            <span>{{ paper.authors.join(', ') }}</span>
+          </div>
 
-      <ng-container matColumnDef="nb_chunks">
-        <th mat-header-cell *matHeaderCellDef>Chunks</th>
-        <td mat-cell *matCellDef="let paper">{{ paper.nb_chunks }}</td>
-      </ng-container>
+          <div class="year" *ngIf="paper.year">
+            <mat-icon class="meta-icon">calendar_today</mat-icon>
+            <span>{{ paper.year }}</span>
+          </div>
 
-      <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef>Actions</th>
-        <td mat-cell *matCellDef="let paper">
-          <button mat-icon-button color="warn" (click)="deletePaper(paper.id)">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </td>
-      </ng-container>
+          <div class="chunks">
+            <mat-icon class="meta-icon">category</mat-icon>
+            <span>{{ paper.nb_chunks }} chunks</span>
+          </div>
+        </div>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
-  </mat-card-content>
-</mat-card>
+        <div class="keywords" *ngIf="paper.keywords && paper.keywords.length > 0">
+          <mat-chip-set>
+            <mat-chip *ngFor="let keyword of paper.keywords.slice(0, 3)">
+              {{ keyword }}
+            </mat-chip>
+            <mat-chip *ngIf="paper.keywords.length > 3">
+              +{{ paper.keywords.length - 3 }}
+            </mat-chip>
+          </mat-chip-set>
+        </div>
+
+        <p class="abstract" *ngIf="paper.abstract">
+          {{ paper.abstract.substring(0, 150) }}{{ paper.abstract.length > 150 ? '...' : '' }}
+        </p>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button mat-button (click)="openPdfViewer(paper)">
+          <mat-icon>visibility</mat-icon>
+          Voir
+        </button>
+        <button mat-button color="warn" (click)="deletePaper(paper, $event)">
+          <mat-icon>delete</mat-icon>
+          Supprimer
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>

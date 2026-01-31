@@ -1,0 +1,70 @@
+<div class="dialog-header">
+  <h2 mat-dialog-title>{{ data.title }}</h2>
+  <div class="header-actions">
+    <a [href]="data.pdfUrl" target="_blank" mat-icon-button matTooltip="Ouvrir dans un nouvel onglet">
+      <mat-icon>open_in_new</mat-icon>
+    </a>
+    <button mat-icon-button (click)="onClose()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+</div>
+
+<mat-dialog-content>
+  <div class="pdf-controls">
+    <div class="zoom-controls">
+      <button mat-icon-button (click)="zoomOut()" [disabled]="zoom <= 0.2 || !isLoaded">
+        <mat-icon>zoom_out</mat-icon>
+      </button>
+      <span class="zoom-label">{{ (zoom * 100).toFixed(0) }}%</span>
+      <button mat-icon-button (click)="zoomIn()" [disabled]="!isLoaded">
+        <mat-icon>zoom_in</mat-icon>
+      </button>
+    </div>
+
+    <div class="page-controls">
+      <button mat-icon-button (click)="previousPage()" [disabled]="page <= 1 || !isLoaded">
+        <mat-icon>navigate_before</mat-icon>
+      </button>
+      <span class="page-label">Page {{ page }} / {{ totalPages || '?' }}</span>
+      <button mat-icon-button (click)="nextPage()" [disabled]="page >= totalPages || !isLoaded">
+        <mat-icon>navigate_next</mat-icon>
+      </button>
+    </div>
+
+    <div class="status-info">
+      <mat-icon *ngIf="!isLoaded && !error" class="loading-icon">hourglass_empty</mat-icon>
+      <span *ngIf="!isLoaded && !error">Chargement...</span>
+      <mat-icon *ngIf="isLoaded" color="primary">check_circle</mat-icon>
+      <span *ngIf="isLoaded">Chargé</span>
+    </div>
+  </div>
+
+  <div class="pdf-container">
+    <div *ngIf="error" class="error-message">
+      <mat-icon color="warn">error</mat-icon>
+      <p>{{ error }}</p>
+      <p class="error-hint">Vérifiez la console du navigateur (F12) pour plus de détails</p>
+    </div>
+
+    <pdf-viewer
+      *ngIf="!error"
+      [src]="data.pdfUrl"
+      [zoom]="zoom"
+      [page]="page"
+      [render-text]="true"
+      [original-size]="false"
+      [fit-to-page]="true"
+      [show-all]="true"
+      [autoresize]="false"
+      [show-borders]="true"
+      [rotation]="0"
+      [external-link-target]="'blank'"
+      (after-load-complete)="afterLoadComplete($event)"
+      (error)="onError($event)"
+      (on-progress)="onProgress($event)"
+      (page-rendered)="onPageRendered($event)"
+      style="display: block; min-height: 600px;"
+    ></pdf-viewer>
+  </div>
+</mat-dialog-content>

@@ -34,18 +34,6 @@ export class UploadPageComponent {
     this.uploadError = null;
     this.uploadSuccess = false;
 
-    // TODO: Implement real upload when the backend is ready
-    console.log('Uploading:', this.selectedFile.name);
-
-    // Simulate upload for now
-    setTimeout(() => {
-      this.uploading = false;
-      this.uploadSuccess = true;
-      this.selectedFile = null;
-    }, 2000);
-
-    // Real code to uncomment when the backend is ready:
-    /*
     this.apiService.uploadPaper(this.selectedFile).subscribe({
       next: (response) => {
         this.uploading = false;
@@ -55,10 +43,9 @@ export class UploadPageComponent {
       },
       error: (error) => {
         this.uploading = false;
-        this.uploadError = error.message || 'Error during upload';
+        this.uploadError = error.error?.detail || error.message || 'Error during upload';
         console.error('Upload error:', error);
       }
     });
-    */
   }
 }

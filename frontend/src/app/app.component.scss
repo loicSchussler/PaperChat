@@ -2,8 +2,75 @@
   flex: 1 1 auto;
 }
 
+.app-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  .app-title {
+    font-size: 20px;
+    font-weight: 500;
+  }
+
+  .mobile-nav {
+    display: none;
+  }
+
+  .desktop-nav {
+    display: flex;
+    gap: 4px;
+
+    button {
+      .nav-label {
+        margin-left: 4px;
+      }
+    }
+  }
+}
+
 .container {
   padding: 20px;
   max-width: 1200px;
   margin: 0 auto;
+}
+
+// Mobile responsive
+@media (max-width: 768px) {
+  .app-toolbar {
+    .app-title {
+      font-size: 16px;
+      max-width: 120px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .desktop-nav {
+      display: none;
+    }
+
+    .mobile-nav {
+      display: flex;
+      gap: 2px;
+    }
+  }
+
+  .container {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-toolbar {
+    padding: 0 8px;
+
+    .app-title {
+      font-size: 14px;
+      max-width: 80px;
+    }
+  }
+
+  .container {
+    padding: 8px;
+  }
 }

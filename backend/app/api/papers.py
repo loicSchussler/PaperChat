@@ -220,7 +220,35 @@ async def delete_paper(paper_id: int, db: Session = Depends(get_db)):
     if not paper:
         raise HTTPException(status_code=404, detail="Paper not found")
 
+    # Delete the PDF file
+    pdf_path = Path(paper.pdf_path)
+    if pdf_path.exists():
+        os.remove(pdf_path)
+
     db.delete(paper)
     db.commit()
 
     return None
+
+
+@router.get("/{paper_id}/pdf")
+async def get_paper_pdf(paper_id: int, db: Session = Depends(get_db)):
+    """
+    Serve the PDF file for a specific paper
+    """
+    from fastapi.responses import FileResponse
+
+    paper = db.query(models.Paper).filter(models.Paper.id == paper_id).first()
+
+    if not paper:
+        raise HTTPException(status_code=404, detail="Paper not found")
+
+    pdf_path = Path(paper.pdf_path)
+    if not pdf_path.exists():
+        raise HTTPException(status_code=404, detail="PDF file not found")
+
+    return FileResponse(
+        path=str(pdf_path),
+        media_type="application/pdf",
+        filename=pdf_path.name
+    )
