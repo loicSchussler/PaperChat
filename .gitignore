@@ -41,5 +41,5 @@ frontend/.angular/
 .DS_Store
 Thumbs.db
 
-.claude
-.github
+.claude/
+.github/
