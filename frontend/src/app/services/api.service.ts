@@ -16,6 +16,7 @@ export interface Paper {
 
 export interface ChatRequest {
   question: string;
+  conversation_id?: number;
   paper_ids?: number[];
   max_sources?: number;
 }
@@ -25,6 +26,7 @@ export interface ChatResponse {
   sources: SourceCitation[];
   cost_usd: number;
   response_time_ms: number;
+  conversation_id: number;
 }
 
 export interface SourceCitation {
@@ -42,6 +44,34 @@ export interface MonitoringStats {
   total_cost_usd: number;
   avg_response_time_ms: number;
   queries_today: number;
+}
+
+export interface Message {
+  id: number;
+  conversation_id: number;
+  role: string;
+  content: string;
+  sources?: SourceCitation[];
+  cost_usd: number;
+  response_time_ms: number;
+  created_at: string;
+}
+
+export interface Conversation {
+  id: number;
+  title: string;
+  created_at: string;
+  updated_at: string;
+  messages: Message[];
+}
+
+export interface ConversationListItem {
+  id: number;
+  title: string;
+  created_at: string;
+  updated_at: string;
+  message_count: number;
+  last_message_preview?: string;
 }
 
 @Injectable({
@@ -82,5 +112,26 @@ export class ApiService {
   // Monitoring endpoint
   getStats(): Observable<MonitoringStats> {
     return this.http.get<MonitoringStats>(`${this.apiUrl}/api/monitoring/stats`);
+  }
+
+  // Conversations endpoints
+  createConversation(title?: string): Observable<Conversation> {
+    return this.http.post<Conversation>(`${this.apiUrl}/api/conversations`, { title });
+  }
+
+  listConversations(skip: number = 0, limit: number = 20): Observable<ConversationListItem[]> {
+    return this.http.get<ConversationListItem[]>(`${this.apiUrl}/api/conversations`, { params: { skip, limit } });
+  }
+
+  getConversation(id: number): Observable<Conversation> {
+    return this.http.get<Conversation>(`${this.apiUrl}/api/conversations/${id}`);
+  }
+
+  deleteConversation(id: number): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.apiUrl}/api/conversations/${id}`);
+  }
+
+  updateConversationTitle(id: number, title: string): Observable<{ message: string }> {
+    return this.http.patch<{ message: string }>(`${this.apiUrl}/api/conversations/${id}/title`, null, { params: { title } });
   }
 }

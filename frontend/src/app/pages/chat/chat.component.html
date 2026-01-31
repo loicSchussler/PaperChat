@@ -1,73 +1,141 @@
-<mat-card>
-  <mat-card-header>
-    <mat-card-title>Posez une question sur vos articles</mat-card-title>
-  </mat-card-header>
+<div class="chat-container">
+  <!-- Conversations Sidebar -->
+  <div class="conversations-sidebar" [class.hidden]="!showConversationList">
+    <div class="sidebar-header">
+      <h2>Conversations</h2>
+      <button mat-icon-button (click)="newConversation()" matTooltip="Nouvelle conversation">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
 
-  <mat-card-content>
-    <div class="question-input">
-      <mat-form-field appearance="outline" style="width: 100%;">
-        <mat-label>Votre question</mat-label>
+    <mat-list class="conversation-list">
+      <mat-list-item
+        *ngFor="let conv of conversations"
+        [class.active]="conv.id === currentConversationId"
+        (click)="selectConversation(conv.id)">
+        <div class="conversation-item">
+          <div class="conversation-header">
+            <span class="conversation-title">{{ conv.title }}</span>
+            <button
+              mat-icon-button
+              (click)="deleteConversation(conv.id, $event)"
+              matTooltip="Supprimer">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+          <div class="conversation-meta">
+            <span class="message-count">{{ conv.message_count }} message(s)</span>
+            <span class="timestamp">{{ conv.updated_at | date:'short' }}</span>
+          </div>
+          <p class="last-message" *ngIf="conv.last_message_preview">
+            {{ conv.last_message_preview }}
+          </p>
+        </div>
+      </mat-list-item>
+    </mat-list>
+  </div>
+
+  <!-- Main Chat Area -->
+  <div class="chat-main" (click)="closeConversationListOnMobile()">
+    <!-- Header -->
+    <div class="chat-header">
+      <button mat-icon-button (click)="toggleConversationList(); $event.stopPropagation()">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <h2>
+        {{ currentConversationId ? 'Conversation' : 'Nouvelle conversation' }}
+      </h2>
+    </div>
+
+    <!-- Messages Area -->
+    <div class="messages-container">
+      <div *ngIf="messages.length === 0 && !loading" class="empty-state">
+        <mat-icon>chat</mat-icon>
+        <p>Commencez une nouvelle conversation en posant une question</p>
+      </div>
+
+      <div *ngFor="let message of messages" class="message" [class.user]="message.role === 'user'" [class.assistant]="message.role === 'assistant'">
+        <div class="message-avatar">
+          <mat-icon>{{ message.role === 'user' ? 'person' : 'smart_toy' }}</mat-icon>
+        </div>
+        <div class="message-content">
+          <div class="message-text">{{ message.content }}</div>
+
+          <!-- Metadata for assistant messages -->
+          <div *ngIf="message.role === 'assistant' && (message.cost_usd || message.response_time_ms)" class="message-metadata">
+            <mat-chip-set aria-label="Metadata">
+              <mat-chip *ngIf="message.response_time_ms">
+                <mat-icon>schedule</mat-icon>
+                {{ message.response_time_ms }}ms
+              </mat-chip>
+              <mat-chip *ngIf="message.cost_usd">
+                <mat-icon>attach_money</mat-icon>
+                ${{ message.cost_usd.toFixed(6) }}
+              </mat-chip>
+              <mat-chip *ngIf="message.sources && message.sources.length > 0">
+                <mat-icon>source</mat-icon>
+                {{ message.sources.length }} source(s)
+              </mat-chip>
+            </mat-chip-set>
+          </div>
+
+          <!-- Sources for assistant messages -->
+          <div *ngIf="message.role === 'assistant' && message.sources && message.sources.length > 0" class="message-sources">
+            <details>
+              <summary>Voir les sources ({{ message.sources.length }})</summary>
+              <div class="sources-list">
+                <mat-card *ngFor="let source of message.sources; let i = index" class="source-card">
+                  <mat-card-content>
+                    <p><strong>[{{ i + 1 }}] {{ source.paper_title }}</strong> ({{ source.paper_year }})</p>
+                    <p class="section" *ngIf="source.section_name">Section: {{ source.section_name }}</p>
+                    <p class="content">{{ source.content }}</p>
+                    <p class="relevance">Pertinence: {{ (source.relevance_score * 100).toFixed(0) }}%</p>
+                  </mat-card-content>
+                </mat-card>
+              </div>
+            </details>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="loading" class="message assistant">
+        <div class="message-avatar">
+          <mat-icon>smart_toy</mat-icon>
+        </div>
+        <div class="message-content">
+          <div class="typing-indicator">
+            <mat-spinner diameter="24"></mat-spinner>
+            <span>Recherche en cours...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="error" class="error-banner">
+      <mat-icon color="warn">error</mat-icon>
+      <span>{{ error }}</span>
+    </div>
+
+    <!-- Input Area -->
+    <div class="chat-input">
+      <mat-form-field appearance="outline" class="question-field">
+        <mat-label>Posez votre question</mat-label>
         <input
           matInput
           [formControl]="questionControl"
           placeholder="Ex: Comment fonctionne l'attention dans les Transformers?"
-          (keyup.enter)="askQuestion()">
+          (keyup.enter)="askQuestion()"
+          [disabled]="loading">
       </mat-form-field>
 
       <button
-        mat-raised-button
+        mat-fab
         color="primary"
         (click)="askQuestion()"
-        [disabled]="loading">
+        [disabled]="loading || !questionControl.value?.trim()">
         <mat-icon>send</mat-icon>
-        Poser la question
       </button>
     </div>
-
-    <div *ngIf="loading" class="loading">
-      <mat-spinner diameter="40"></mat-spinner>
-      <p>Recherche en cours...</p>
-    </div>
-
-    <div *ngIf="error" class="error">
-      <mat-icon color="warn">error</mat-icon>
-      <p>{{ error }}</p>
-    </div>
-
-    <div *ngIf="answer" class="answer-section">
-      <h3>Réponse:</h3>
-      <div class="answer-box">
-        {{ answer }}
-      </div>
-
-      <div class="metadata" *ngIf="costUsd !== null || responseTimeMs !== null">
-        <mat-chip-set aria-label="Metadata">
-          <mat-chip *ngIf="responseTimeMs !== null">
-            <mat-icon>schedule</mat-icon>
-            {{ responseTimeMs }}ms
-          </mat-chip>
-          <mat-chip *ngIf="costUsd !== null">
-            <mat-icon>attach_money</mat-icon>
-            ${{ costUsd.toFixed(6) }}
-          </mat-chip>
-          <mat-chip *ngIf="sources.length > 0">
-            <mat-icon>source</mat-icon>
-            {{ sources.length }} source(s)
-          </mat-chip>
-        </mat-chip-set>
-      </div>
-
-      <div *ngIf="sources.length > 0" class="sources-section">
-        <h3>Sources:</h3>
-        <mat-card *ngFor="let source of sources; let i = index" class="source-card">
-          <mat-card-content>
-            <p><strong>[{{ i + 1 }}] {{ source.paper_title }}</strong> ({{ source.paper_year }})</p>
-            <p class="section">Section: {{ source.section_name }}</p>
-            <p class="content">{{ source.content }}</p>
-            <p class="relevance">Pertinence: {{ (source.relevance_score * 100).toFixed(0) }}%</p>
-          </mat-card-content>
-        </mat-card>
-      </div>
-    </div>
-  </mat-card-content>
-</mat-card>
+  </div>
+</div>

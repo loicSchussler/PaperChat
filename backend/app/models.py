@@ -57,3 +57,37 @@ class QueryLog(Base):
     cost_usd = Column(Float, default=0.0)
     response_time_ms = Column(Integer, default=0)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class Conversation(Base):
+    """
+    Table to store conversation sessions
+    """
+    __tablename__ = "conversations"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=True)  # Optional title for the conversation
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    # Relationship with messages
+    messages = relationship("Message", back_populates="conversation", cascade="all, delete-orphan", order_by="Message.created_at")
+
+
+class Message(Base):
+    """
+    Table to store individual messages in conversations
+    """
+    __tablename__ = "messages"
+
+    id = Column(Integer, primary_key=True, index=True)
+    conversation_id = Column(Integer, ForeignKey("conversations.id", ondelete="CASCADE"), nullable=False)
+    role = Column(String, nullable=False)  # 'user' or 'assistant'
+    content = Column(Text, nullable=False)
+    sources = Column(Text, nullable=True)  # JSON string of sources (for assistant messages)
+    cost_usd = Column(Float, default=0.0)
+    response_time_ms = Column(Integer, default=0)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    # Relationship with conversation
+    conversation = relationship("Conversation", back_populates="messages")

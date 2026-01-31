@@ -1,22 +1,89 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { ApiService } from '../../services/api.service';
+import { ApiService, Message, ConversationListItem } from '../../services/api.service';
 
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss']
 })
-export class ChatPageComponent {
+export class ChatPageComponent implements OnInit {
   questionControl = new FormControl('');
-  answer: string | null = null;
-  sources: any[] = [];
   loading = false;
   error: string | null = null;
-  costUsd: number | null = null;
-  responseTimeMs: number | null = null;
+
+  // Conversation management
+  currentConversationId: number | null = null;
+  messages: Message[] = [];
+  conversations: ConversationListItem[] = [];
+  showConversationList = true;
 
   constructor(private apiService: ApiService) {}
+
+  ngOnInit() {
+    this.loadConversations();
+  }
+
+  loadConversations() {
+    this.apiService.listConversations().subscribe({
+      next: (conversations) => {
+        this.conversations = conversations;
+      },
+      error: (err) => {
+        console.error('Error loading conversations:', err);
+      }
+    });
+  }
+
+  selectConversation(conversationId: number) {
+    this.currentConversationId = conversationId;
+    this.error = null;
+    this.loading = true;
+
+    this.apiService.getConversation(conversationId).subscribe({
+      next: (conversation) => {
+        this.messages = conversation.messages;
+        this.loading = false;
+      },
+      error: (err) => {
+        console.error('Error loading conversation:', err);
+        this.error = 'Erreur lors du chargement de la conversation';
+        this.loading = false;
+      }
+    });
+  }
+
+  newConversation() {
+    this.currentConversationId = null;
+    this.messages = [];
+    this.error = null;
+
+    // Hide conversation list on mobile to show we're in a new conversation
+    if (window.innerWidth <= 768) {
+      this.showConversationList = false;
+    }
+  }
+
+  deleteConversation(conversationId: number, event: Event) {
+    event.stopPropagation();
+
+    if (!confirm('Voulez-vous vraiment supprimer cette conversation ?')) {
+      return;
+    }
+
+    this.apiService.deleteConversation(conversationId).subscribe({
+      next: () => {
+        if (this.currentConversationId === conversationId) {
+          this.newConversation();
+        }
+        this.loadConversations();
+      },
+      error: (err) => {
+        console.error('Error deleting conversation:', err);
+        this.error = 'Erreur lors de la suppression';
+      }
+    });
+  }
 
   askQuestion() {
     const question = this.questionControl.value?.trim();
@@ -28,24 +95,60 @@ export class ChatPageComponent {
 
     this.loading = true;
     this.error = null;
-    this.answer = null;
-    this.sources = [];
-    this.costUsd = null;
-    this.responseTimeMs = null;
 
-    this.apiService.askQuestion({ question }).subscribe({
+    // Add user message optimistically to UI
+    const userMessage: Partial<Message> = {
+      role: 'user',
+      content: question,
+      cost_usd: 0,
+      response_time_ms: 0,
+      created_at: new Date().toISOString()
+    };
+    this.messages.push(userMessage as Message);
+
+    this.apiService.askQuestion({
+      question,
+      conversation_id: this.currentConversationId || undefined
+    }).subscribe({
       next: (response) => {
-        this.answer = response.answer;
-        this.sources = response.sources;
-        this.costUsd = response.cost_usd;
-        this.responseTimeMs = response.response_time_ms;
+        // Update conversation ID if this was a new conversation
+        if (!this.currentConversationId) {
+          this.currentConversationId = response.conversation_id;
+          this.loadConversations();
+        }
+
+        // Add assistant message
+        const assistantMessage: Partial<Message> = {
+          role: 'assistant',
+          content: response.answer,
+          sources: response.sources,
+          cost_usd: response.cost_usd,
+          response_time_ms: response.response_time_ms,
+          created_at: new Date().toISOString()
+        };
+        this.messages.push(assistantMessage as Message);
+
+        this.questionControl.setValue('');
         this.loading = false;
       },
       error: (err) => {
         console.error('Error during chat request:', err);
         this.error = err.error?.detail || err.message || 'Erreur lors de la requête';
+        // Remove optimistic user message on error
+        this.messages.pop();
         this.loading = false;
       }
     });
+  }
+
+  toggleConversationList() {
+    this.showConversationList = !this.showConversationList;
+  }
+
+  closeConversationListOnMobile() {
+    // Close sidebar on mobile when clicking on main chat area
+    if (window.innerWidth <= 768 && this.showConversationList) {
+      this.showConversationList = false;
+    }
   }
 }

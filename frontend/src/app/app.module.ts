@@ -17,6 +17,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatListModule } from '@angular/material/list';
 
 // PDF Viewer
 import { PdfViewerModule } from 'ng2-pdf-viewer';
@@ -56,6 +57,7 @@ import { PdfViewerDialogComponent } from './components/pdf-viewer-dialog/pdf-vie
     MatGridListModule,
     MatChipsModule,
     MatTooltipModule,
+    MatListModule,
     PdfViewerModule
   ],
   providers: [],

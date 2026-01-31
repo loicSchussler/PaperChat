@@ -14,7 +14,11 @@
       "Bash(git commit:*)",
       "Bash(git reset:*)",
       "Bash(git push:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(alembic revision:*)",
+      "Bash(python -m alembic revision:*)",
+      "Bash(python run_migration.py:*)",
+      "Bash(docker ps:*)"
     ]
   }
 }

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
-from app.api import papers, chat, monitoring
+from app.api import papers, chat, monitoring, conversations
 
 app = FastAPI(
     title="PaperChat RAG API",
@@ -23,6 +23,7 @@ app.add_middleware(
 # Include routers
 app.include_router(papers.router)
 app.include_router(chat.router)
+app.include_router(conversations.router)
 app.include_router(monitoring.router)
 
 @app.get("/")

@@ -28,6 +28,7 @@ class PaperResponse(PaperBase):
 # Chat Schemas
 class ChatRequest(BaseModel):
     question: str
+    conversation_id: Optional[int] = None  # Optional conversation ID for context
     paper_ids: Optional[List[int]] = None
     max_sources: int = 5
 
@@ -45,6 +46,55 @@ class ChatResponse(BaseModel):
     sources: List[SourceCitation]
     cost_usd: float
     response_time_ms: int
+    conversation_id: int  # ID of the conversation this message belongs to
+
+
+# Conversation Schemas
+class MessageBase(BaseModel):
+    role: str  # 'user' or 'assistant'
+    content: str
+
+
+class MessageResponse(MessageBase):
+    id: int
+    conversation_id: int
+    sources: Optional[List[SourceCitation]] = None
+    cost_usd: float = 0.0
+    response_time_ms: int = 0
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class ConversationBase(BaseModel):
+    title: Optional[str] = None
+
+
+class ConversationCreate(ConversationBase):
+    pass
+
+
+class ConversationResponse(ConversationBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+    messages: List[MessageResponse] = []
+
+    class Config:
+        from_attributes = True
+
+
+class ConversationListItem(BaseModel):
+    id: int
+    title: Optional[str]
+    created_at: datetime
+    updated_at: datetime
+    message_count: int
+    last_message_preview: Optional[str] = None
+
+    class Config:
+        from_attributes = True
 
 
 # Monitoring Schemas

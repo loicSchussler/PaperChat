@@ -24,7 +24,7 @@ async def generate_rag_answer(
     paper_ids: list = None
 ) -> Dict[str, Any]:
     """
-    Complete RAG pipeline to answer a question
+    Complete RAG pipeline to answer a question (without conversation context)
 
     Args:
         db: Database session
@@ -35,6 +35,38 @@ async def generate_rag_answer(
     Returns:
         Dict with answer, sources, cost_usd, response_time_ms
     """
+    return await generate_rag_answer_with_context(
+        db=db,
+        question=question,
+        conversation_history=[],
+        max_sources=max_sources,
+        paper_ids=paper_ids
+    )
+
+
+async def generate_rag_answer_with_context(
+    db: Session,
+    question: str,
+    conversation_history: List[Dict[str, str]] = None,
+    max_sources: int = 5,
+    paper_ids: list = None
+) -> Dict[str, Any]:
+    """
+    Complete RAG pipeline to answer a question with conversation context
+
+    Args:
+        db: Database session
+        question: User's question
+        conversation_history: List of previous messages [{"role": "user/assistant", "content": "..."}]
+        max_sources: Maximum number of sources to use
+        paper_ids: Paper IDs to filter the search
+
+    Returns:
+        Dict with answer, sources, cost_usd, response_time_ms
+    """
+    if conversation_history is None:
+        conversation_history = []
+
     start_time = time.time()
 
     # 1. Vectorize the question
@@ -51,7 +83,7 @@ async def generate_rag_answer(
     # 3. Build the context from retrieved chunks
     context = _build_context(search_results)
 
-    # 4. Call Mammouth AI for generation
+    # 4. Build messages with conversation history
     messages = [
         {
             "role": "system",
@@ -59,15 +91,26 @@ async def generate_rag_answer(
                 "You are a helpful assistant specialized in analyzing scientific papers. "
                 "Answer the user's question based ONLY on the provided context from the papers. "
                 "If the context doesn't contain enough information to answer the question, "
-                "say so clearly. Cite the papers when appropriate."
+                "say so clearly. Cite the papers when appropriate. "
+                "Take into account the conversation history to provide coherent and contextual answers."
             )
-        },
-        {
-            "role": "user",
-            "content": f"Context from papers:\n\n{context}\n\nQuestion: {question}"
         }
     ]
 
+    # Add conversation history (limit to last 10 messages to avoid token limits)
+    for msg in conversation_history[-10:]:
+        messages.append({
+            "role": msg["role"],
+            "content": msg["content"]
+        })
+
+    # Add current question with context
+    messages.append({
+        "role": "user",
+        "content": f"Context from papers:\n\n{context}\n\nQuestion: {question}"
+    })
+
+    # 5. Call Mammouth AI for generation
     response = await client.chat.completions.create(
         model=settings.OPENAI_CHAT_MODEL,
         messages=messages,
@@ -80,13 +123,13 @@ async def generate_rag_answer(
     prompt_tokens = response.usage.prompt_tokens
     completion_tokens = response.usage.completion_tokens
 
-    # 5. Calculate the cost
+    # 6. Calculate the cost
     cost_usd = calculate_cost(prompt_tokens, completion_tokens)
 
     # Calculate response time
     response_time_ms = int((time.time() - start_time) * 1000)
 
-    # 6. Deduplicate and format sources for response
+    # 7. Deduplicate and format sources for response
     deduplicated_sources = _deduplicate_sources(search_results)
 
     return {
