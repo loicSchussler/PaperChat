@@ -1,22 +1,34 @@
 # PaperChat RAG
 
-Assistant IA pour analyser, indexer et interroger des articles scientifiques en utilisant la technique RAG (Retrieval-Augmented Generation).
+Assistant IA pour analyser, indexer et interroger des articles scientifiques en utilisant la technique RAG (Retrieval-Augmented Generation) avec système de conversations persistantes.
 
-## 🎯 Objectif
+## 🎯 Fonctionnalités
 
-Créer un système capable de :
-- Uploader et analyser des articles scientifiques (PDF)
-- Extraire automatiquement les métadonnées (titre, auteurs, année, abstract)
-- Découper intelligemment les documents en chunks
-- Indexer les chunks avec des embeddings dans PostgreSQL + pgvector
-- Répondre à des questions en langage naturel avec citations des sources
+### ✅ Implémenté
+
+- **Upload et analyse de PDFs**: Extraction automatique du texte et des métadonnées
+- **Extraction de métadonnées**: Titre, auteurs, année, abstract et mots-clés via LLM
+- **Chunking intelligent**: Découpage sémantique avec LangChain (RecursiveCharacterTextSplitter)
+- **Embeddings**: Vectorisation avec text-embedding-3-small (OpenAI/Mammouth AI)
+- **Recherche vectorielle**: Similarité cosinus avec pgvector
+- **Pipeline RAG complet**: Génération de réponses contextuelles avec citations des sources
+- **Déduplication des sources**: Regroupement intelligent des chunks par article
+- **Système de conversations**:
+  - Historique persistant des messages
+  - Mémoire contextuelle (10 derniers messages)
+  - Interface type messenger avec sidebar
+  - Gestion complète (création, lecture, suppression)
+- **Monitoring**: Dashboard avec statistiques d'utilisation et coûts
+- **Visualiseur PDF**: Intégré dans la bibliothèque
 
 ## 🏗️ Architecture
 
 - **Backend**: FastAPI (Python 3.11+)
-- **Base de données**: PostgreSQL avec extension pgvector
+- **Base de données**: PostgreSQL 15 avec extension pgvector
 - **Frontend**: Angular 18 avec Angular Material
-- **LLM**: Mammouth AI (API compatible OpenAI - GPT-4o-mini pour génération, text-embedding-3-small pour embeddings)
+- **LLM**: Mammouth AI (API compatible OpenAI)
+  - GPT-4o-mini pour génération de texte
+  - text-embedding-3-small pour embeddings
 - **RAG**: LangChain pour le chunking et le pipeline
 
 ## 📋 Prérequis
@@ -42,14 +54,18 @@ Copier le fichier `.env.example` vers `.env` :
 cp .env.example .env
 ```
 
-La clé API Mammouth AI est déjà configurée dans `.env.example` :
+Ensuite, éditer `.env` et ajouter votre clé API Mammouth AI :
 
 ```
-OPENAI_API_KEY=SECRET_REMOVED
+OPENAI_API_KEY=votre-clé-api-mammouth
 OPENAI_API_BASE=https://api.mammouth.ai/v1
+OPENAI_CHAT_MODEL=gpt-4.1-nano
+OPENAI_EMBEDDING_MODEL=text-embedding-3-small
 ```
 
-**Note**: Mammouth AI utilise une API compatible OpenAI, donc le code utilise la bibliothèque `openai` avec un `base_url` personnalisé.
+**Note**:
+- Obtenez votre clé API sur [mammouth.ai](https://mammouth.ai)
+- Mammouth AI utilise une API compatible OpenAI, donc le code utilise la bibliothèque `openai` avec un `base_url` personnalisé
 
 ### 3. Démarrer avec Docker Compose
 
@@ -58,15 +74,21 @@ docker-compose up -d
 ```
 
 Cela va démarrer :
-- PostgreSQL avec pgvector sur le port 5432
+- PostgreSQL 15 avec pgvector sur le port 5432
 - Backend FastAPI sur le port 8000
 
 ### 4. Créer les tables de la base de données
 
 ```bash
+# Tables principales (papers, chunks, query_logs)
 cd backend
 python create_db.py
+
+# Tables de conversations (conversations, messages)
+docker exec paperchat_backend python run_migration.py
 ```
+
+**Note**: Le script `run_migration.py` crée les tables `conversations` et `messages` nécessaires pour le système de conversations.
 
 ### 5. Démarrer le frontend Angular
 
@@ -101,6 +123,7 @@ docker-compose up -d db
 
 ```bash
 python create_db.py
+docker exec paperchat_backend python run_migration.py
 ```
 
 4. Lancer le serveur FastAPI :
@@ -126,91 +149,209 @@ npm start
 PaperChat/
 ├── backend/
 │   ├── app/
-│   │   ├── api/           # Endpoints REST
-│   │   ├── services/      # Logique métier (PDF, RAG, etc.)
-│   │   ├── models.py      # Modèles SQLAlchemy
-│   │   ├── schemas.py     # Schémas Pydantic
-│   │   ├── database.py    # Configuration DB
-│   │   └── main.py        # Application FastAPI
+│   │   ├── api/              # Endpoints REST
+│   │   │   ├── papers.py     # Gestion des articles
+│   │   │   ├── chat.py       # Chat RAG
+│   │   │   ├── conversations.py  # Gestion des conversations
+│   │   │   └── monitoring.py # Statistiques
+│   │   ├── services/         # Logique métier
+│   │   │   ├── pdf_extractor.py     # Extraction texte PDF
+│   │   │   ├── metadata_extractor.py # Extraction métadonnées
+│   │   │   ├── chunker.py           # Découpage intelligent
+│   │   │   ├── embeddings.py        # Génération embeddings
+│   │   │   ├── vector_store.py      # Recherche vectorielle
+│   │   │   └── rag.py              # Pipeline RAG complet
+│   │   ├── models.py         # Modèles SQLAlchemy
+│   │   ├── schemas.py        # Schémas Pydantic
+│   │   ├── database.py       # Configuration DB
+│   │   └── main.py          # Application FastAPI
+│   ├── migrations/           # Scripts de migration SQL
+│   ├── tests/               # Tests unitaires
 │   ├── requirements.txt
+│   ├── run_migration.py     # Script de migration
 │   └── Dockerfile
 ├── frontend/
 │   ├── src/
 │   │   ├── app/
-│   │   │   ├── pages/     # Pages (Upload, Library, Chat, Dashboard)
-│   │   │   └── services/  # Services API
+│   │   │   ├── pages/        # Pages Angular
+│   │   │   │   ├── upload/   # Upload PDFs
+│   │   │   │   ├── library/  # Bibliothèque
+│   │   │   │   ├── chat/     # Chat RAG
+│   │   │   │   └── dashboard/ # Monitoring
+│   │   │   ├── services/     # Services API
+│   │   │   └── components/   # Composants réutilisables
 │   │   └── environments/
 │   └── package.json
 ├── docker-compose.yml
 └── README.md
 ```
 
-## 🔧 À Implémenter
-
-Le boilerplate est en place, voici les fonctionnalités principales à développer :
-
-### Backend (dans `backend/app/services/`)
-
-1. **pdf_extractor.py** : Extraction de texte avec pypdf
-2. **metadata_extractor.py** : Extraction de métadonnées via OpenAI
-3. **chunker.py** : Découpage intelligent avec LangChain
-4. **embeddings.py** : Génération d'embeddings OpenAI
-5. **vector_store.py** : Recherche vectorielle avec pgvector
-6. **rag.py** : Pipeline RAG complet
-
-### Frontend
-
-Les composants sont prêts mais utilisent des données mockées. Décommenter les appels API dans :
-- `upload.component.ts`
-- `library.component.ts`
-- `chat.component.ts`
-- `dashboard.component.ts`
-
-## 🧪 Tests
-
-```bash
-cd backend
-pytest
-```
-
 ## 📊 API Endpoints
 
-- `POST /api/papers/upload` - Upload un PDF
-- `GET /api/papers` - Liste des articles
+### Papers
+- `POST /api/papers/upload` - Upload et indexation d'un PDF
+- `GET /api/papers` - Liste des articles (avec recherche et filtres)
 - `GET /api/papers/{id}` - Détails d'un article
 - `DELETE /api/papers/{id}` - Supprimer un article
-- `POST /api/chat` - Poser une question RAG
-- `GET /api/monitoring/stats` - Statistiques d'utilisation
+
+### Chat RAG
+- `POST /api/chat` - Poser une question avec contexte conversationnel
+  - Supporte `conversation_id` pour continuer une conversation
+  - Créé automatiquement une nouvelle conversation si non fourni
+
+### Conversations
+- `POST /api/conversations` - Créer une nouvelle conversation
+- `GET /api/conversations` - Liste des conversations (avec pagination)
+- `GET /api/conversations/{id}` - Détails d'une conversation avec messages
+- `DELETE /api/conversations/{id}` - Supprimer une conversation
+- `PATCH /api/conversations/{id}/title` - Modifier le titre
+
+### Monitoring
+- `GET /api/monitoring/stats` - Statistiques d'utilisation (coûts, performances)
 
 Documentation complète : [http://localhost:8000/docs](http://localhost:8000/docs)
 
 ## 🎨 Interface Utilisateur
 
-- **/upload** : Upload et indexation de PDFs
-- **/library** : Liste et gestion des articles
-- **/chat** : Interface de questions/réponses RAG
-- **/dashboard** : Monitoring (coûts, performances)
+### Pages
+
+- **/upload** : Upload et indexation de PDFs avec barre de progression
+- **/library** : Bibliothèque d'articles avec recherche, filtres et visualiseur PDF intégré
+- **/chat** : Interface de conversations type messenger
+  - Sidebar avec liste des conversations
+  - Historique des messages persistant
+  - Bulles de chat (utilisateur / assistant)
+  - Affichage des sources avec pertinence
+  - Métadonnées (temps de réponse, coût)
+  - Responsive mobile avec sidebar toggleable
+- **/dashboard** : Monitoring en temps réel
+  - Nombre d'articles et chunks
+  - Statistiques de requêtes
+  - Coûts totaux et moyens
+  - Temps de réponse moyen
 
 ## 📝 Base de Données
 
 ### Tables
 
-- **papers** : Articles scientifiques (métadonnées)
-- **chunks** : Segments de texte avec embeddings (vecteurs 1536D)
-- **query_logs** : Historique des requêtes et coûts
+#### papers
+Articles scientifiques avec métadonnées extraites
+
+| Colonne | Type | Description |
+|---------|------|-------------|
+| id | INTEGER | Clé primaire |
+| title | VARCHAR | Titre de l'article |
+| authors | TEXT[] | Liste des auteurs |
+| year | INTEGER | Année de publication |
+| abstract | TEXT | Résumé |
+| keywords | TEXT[] | Mots-clés |
+| nb_chunks | INTEGER | Nombre de chunks |
+| created_at | TIMESTAMP | Date d'ajout |
+
+#### chunks
+Segments de texte avec embeddings vectoriels (1536D)
+
+| Colonne | Type | Description |
+|---------|------|-------------|
+| id | INTEGER | Clé primaire |
+| paper_id | INTEGER | Référence à papers |
+| content | TEXT | Contenu du chunk |
+| section_name | VARCHAR | Nom de la section |
+| embedding | VECTOR(1536) | Vecteur d'embedding |
+| created_at | TIMESTAMP | Date de création |
+
+#### conversations
+Sessions de conversations
+
+| Colonne | Type | Description |
+|---------|------|-------------|
+| id | INTEGER | Clé primaire |
+| title | VARCHAR | Titre de la conversation |
+| created_at | TIMESTAMP | Date de création |
+| updated_at | TIMESTAMP | Dernière mise à jour |
+
+#### messages
+Messages individuels dans les conversations
+
+| Colonne | Type | Description |
+|---------|------|-------------|
+| id | INTEGER | Clé primaire |
+| conversation_id | INTEGER | Référence à conversations |
+| role | VARCHAR | 'user' ou 'assistant' |
+| content | TEXT | Contenu du message |
+| sources | TEXT | JSON des sources (pour assistant) |
+| cost_usd | FLOAT | Coût de la requête |
+| response_time_ms | INTEGER | Temps de réponse |
+| created_at | TIMESTAMP | Date de création |
+
+#### query_logs
+Historique des requêtes et métriques
+
+| Colonne | Type | Description |
+|---------|------|-------------|
+| id | INTEGER | Clé primaire |
+| question | TEXT | Question posée |
+| answer | TEXT | Réponse générée |
+| nb_sources | INTEGER | Nombre de sources |
+| prompt_tokens | INTEGER | Tokens du prompt |
+| completion_tokens | INTEGER | Tokens de complétion |
+| cost_usd | FLOAT | Coût total |
+| response_time_ms | INTEGER | Temps de réponse |
+| created_at | TIMESTAMP | Date de la requête |
 
 ### Extension pgvector
 
-L'extension pgvector est activée pour permettre la recherche de similarité vectorielle.
+L'extension pgvector permet la recherche de similarité vectorielle avec l'opérateur de distance cosinus pour les embeddings 1536D.
 
-## 💡 Conseils de Développement
+## 🧪 Tests
 
-1. Commencer par implémenter l'upload PDF et l'extraction de texte
-2. Ajouter l'extraction de métadonnées via OpenAI
-3. Implémenter le chunking avec LangChain
-4. Générer et stocker les embeddings
-5. Développer la recherche vectorielle
-6. Finaliser le pipeline RAG complet
+Le projet inclut des tests unitaires complets :
+
+```bash
+cd backend
+pytest
+
+# Avec couverture
+pytest --cov=app
+
+# Tests spécifiques
+pytest tests/test_vector_store.py
+pytest tests/test_rag.py
+```
+
+**Couverture actuelle**: 45 tests (vector_store + RAG + déduplication)
+
+## 🔧 Pipeline RAG
+
+### Étapes du Pipeline
+
+1. **Extraction** : Lecture du PDF et extraction du texte brut
+2. **Métadonnées** : Extraction via LLM (titre, auteurs, année, abstract, keywords)
+3. **Chunking** : Découpage sémantique avec LangChain (1000 caractères, overlap 200)
+4. **Embeddings** : Vectorisation des chunks (text-embedding-3-small, 1536D)
+5. **Indexation** : Stockage dans PostgreSQL avec pgvector
+6. **Recherche** : Similarité cosinus pour trouver les chunks pertinents (top-k)
+7. **Génération** : LLM génère la réponse avec contexte + historique conversation
+8. **Déduplication** : Regroupement des chunks par article source
+
+### Fonctionnalités Avancées
+
+- **Mémoire contextuelle** : Les 10 derniers messages sont inclus dans le contexte LLM
+- **Déduplication intelligente** : Les chunks d'un même article sont fusionnés
+- **Citations précises** : Chaque source inclut le titre, l'année, la section et le score de pertinence
+- **Coûts optimisés** : Calcul précis des tokens et coûts Mammouth AI
+
+## 💡 Améliorations Futures
+
+- [ ] Support de formats additionnels (EPUB, DOCX)
+- [ ] Recherche hybride (dense + sparse)
+- [ ] Fine-tuning des embeddings
+- [ ] Export de conversations
+- [ ] Annotations et highlights
+- [ ] Partage de conversations
+- [ ] Multi-utilisateurs avec authentification
+- [ ] Amélioration de la génération de titres de conversations
+- [ ] Support du streaming pour les réponses longues
 
 ## 📚 Ressources
 
@@ -224,3 +365,7 @@ L'extension pgvector est activée pour permettre la recherche de similarité vec
 ## 📄 Licence
 
 Projet portfolio / Proof of Concept
+
+---
+
+**Développé avec** ❤️ **et Claude Code**
