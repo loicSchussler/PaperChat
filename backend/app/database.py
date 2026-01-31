@@ -16,7 +16,7 @@ Base = declarative_base()
 
 def get_db():
     """
-    Dependency pour obtenir une session de base de données
+    Dependency to get a database session
     """
     db = SessionLocal()
     try:

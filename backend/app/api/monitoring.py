@@ -11,7 +11,7 @@ router = APIRouter(prefix="/api/monitoring", tags=["monitoring"])
 @router.get("/stats", response_model=MonitoringStats)
 async def get_stats(db: Session = Depends(get_db)):
     """
-    Statistiques d'utilisation et de coûts
+    Usage and cost statistics
     """
     total_papers = db.query(func.count(models.Paper.id)).scalar() or 0
     total_chunks = db.query(func.count(models.Chunk.id)).scalar() or 0
@@ -20,7 +20,7 @@ async def get_stats(db: Session = Depends(get_db)):
     total_cost = db.query(func.sum(models.QueryLog.cost_usd)).scalar() or 0.0
     avg_response_time = db.query(func.avg(models.QueryLog.response_time_ms)).scalar() or 0.0
 
-    # Requêtes aujourd'hui
+    # Queries today
     from datetime import datetime, timedelta
     today = datetime.now().date()
     queries_today = db.query(func.count(models.QueryLog.id)).filter(

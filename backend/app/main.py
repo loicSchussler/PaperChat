@@ -5,14 +5,16 @@ from app.api import papers, chat, monitoring
 
 app = FastAPI(
     title="PaperChat RAG API",
-    description="API pour l'analyse et l'interrogation d'articles scientifiques",
+    description="API for analysis and querying of scientific papers",
     version="1.0.0"
 )
 
-# Configuration CORS pour le frontend Angular
+# CORS configuration
+# En développement, on autorise toutes les origins pour les tests (curl, Postman, etc.)
+# En production, limiter à allow_origins=["http://localhost:4200", "https://votre-domaine.com"]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4200"],  # Frontend Angular
+    allow_origins=["*"],  # Autorise toutes les origins en dev
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

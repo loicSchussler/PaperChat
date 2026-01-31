@@ -20,7 +20,7 @@ export class LibraryPageComponent implements OnInit {
   loadPapers() {
     this.loading = true;
 
-    // TODO: Décommenter quand le backend sera prêt
+    // TODO: Uncomment when the backend is ready
     /*
     this.apiService.listPapers().subscribe({
       next: (papers) => {
@@ -28,13 +28,13 @@ export class LibraryPageComponent implements OnInit {
         this.loading = false;
       },
       error: (error) => {
-        console.error('Erreur chargement papers:', error);
+        console.error('Error loading papers:', error);
         this.loading = false;
       }
     });
     */
 
-    // Données mockées pour le moment
+    // Mock data for now
     setTimeout(() => {
       this.papers = [];
       this.loading = false;
@@ -42,9 +42,9 @@ export class LibraryPageComponent implements OnInit {
   }
 
   deletePaper(id: number) {
-    if (confirm('Voulez-vous vraiment supprimer cet article?')) {
-      // TODO: Implémenter la suppression
-      console.log('Suppression du paper:', id);
+    if (confirm('Do you really want to delete this article?')) {
+      // TODO: Implement deletion
+      console.log('Deleting paper:', id);
     }
   }
 }

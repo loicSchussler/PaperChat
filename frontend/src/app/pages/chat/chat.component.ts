@@ -20,7 +20,7 @@ export class ChatPageComponent {
     const question = this.questionControl.value?.trim();
 
     if (!question) {
-      this.error = 'Veuillez saisir une question';
+      this.error = 'Please enter a question';
       return;
     }
 
@@ -29,12 +29,12 @@ export class ChatPageComponent {
     this.answer = null;
     this.sources = [];
 
-    // TODO: Décommenter quand le backend sera prêt
+    // TODO: Uncomment when the backend is ready
     console.log('Question:', question);
 
-    // Simulation pour le moment
+    // Simulation for now
     setTimeout(() => {
-      this.answer = 'Le backend n\'est pas encore implémenté. Veuillez coder la logique RAG!';
+      this.answer = 'The backend is not yet implemented. Please code the RAG logic!';
       this.loading = false;
     }, 1000);
 
@@ -46,7 +46,7 @@ export class ChatPageComponent {
         this.loading = false;
       },
       error: (error) => {
-        this.error = error.message || 'Erreur lors de la requête';
+        this.error = error.message || 'Error during request';
         this.loading = false;
       }
     });

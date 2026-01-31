@@ -20,13 +20,13 @@ export class UploadPageComponent {
       this.selectedFile = file;
       this.uploadError = null;
     } else {
-      this.uploadError = 'Veuillez sélectionner un fichier PDF';
+      this.uploadError = 'Please select a PDF file';
     }
   }
 
   onUpload() {
     if (!this.selectedFile) {
-      this.uploadError = 'Aucun fichier sélectionné';
+      this.uploadError = 'No file selected';
       return;
     }
 
@@ -34,29 +34,29 @@ export class UploadPageComponent {
     this.uploadError = null;
     this.uploadSuccess = false;
 
-    // TODO: Implémenter l'upload réel quand le backend sera prêt
-    console.log('Upload de:', this.selectedFile.name);
+    // TODO: Implement real upload when the backend is ready
+    console.log('Uploading:', this.selectedFile.name);
 
-    // Simuler un upload pour le moment
+    // Simulate upload for now
     setTimeout(() => {
       this.uploading = false;
       this.uploadSuccess = true;
       this.selectedFile = null;
     }, 2000);
 
-    // Code réel à décommenter quand le backend sera prêt:
+    // Real code to uncomment when the backend is ready:
     /*
     this.apiService.uploadPaper(this.selectedFile).subscribe({
       next: (response) => {
         this.uploading = false;
         this.uploadSuccess = true;
         this.selectedFile = null;
-        console.log('Upload réussi:', response);
+        console.log('Upload successful:', response);
       },
       error: (error) => {
         this.uploading = false;
-        this.uploadError = error.message || 'Erreur lors de l\'upload';
-        console.error('Erreur upload:', error);
+        this.uploadError = error.message || 'Error during upload';
+        console.error('Upload error:', error);
       }
     });
     */

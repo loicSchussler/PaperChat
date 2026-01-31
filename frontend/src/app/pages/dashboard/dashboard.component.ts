@@ -19,7 +19,7 @@ export class DashboardPageComponent implements OnInit {
   loadStats() {
     this.loading = true;
 
-    // TODO: Décommenter quand le backend sera prêt
+    // TODO: Uncomment when the backend is ready
     /*
     this.apiService.getStats().subscribe({
       next: (stats) => {
@@ -27,13 +27,13 @@ export class DashboardPageComponent implements OnInit {
         this.loading = false;
       },
       error: (error) => {
-        console.error('Erreur chargement stats:', error);
+        console.error('Error loading stats:', error);
         this.loading = false;
       }
     });
     */
 
-    // Données mockées
+    // Mock data
     setTimeout(() => {
       this.stats = {
         total_papers: 0,

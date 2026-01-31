@@ -7,7 +7,7 @@ from app.database import Base
 
 class Paper(Base):
     """
-    Table pour stocker les articles scientifiques
+    Table to store scientific papers
     """
     __tablename__ = "papers"
 
@@ -20,13 +20,13 @@ class Paper(Base):
     pdf_path = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    # Relation avec les chunks
+    # Relationship with chunks
     chunks = relationship("Chunk", back_populates="paper", cascade="all, delete-orphan")
 
 
 class Chunk(Base):
     """
-    Table pour stocker les segments de texte avec leurs embeddings
+    Table to store text segments with their embeddings
     """
     __tablename__ = "chunks"
 
@@ -38,13 +38,13 @@ class Chunk(Base):
     embedding = Column(Vector(1536), nullable=True)  # OpenAI text-embedding-3-small = 1536 dimensions
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    # Relation avec le paper
+    # Relationship with paper
     paper = relationship("Paper", back_populates="chunks")
 
 
 class QueryLog(Base):
     """
-    Table pour logger les requêtes et calculer les coûts
+    Table to log queries and calculate costs
     """
     __tablename__ = "query_logs"
 

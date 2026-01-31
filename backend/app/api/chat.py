@@ -12,15 +12,15 @@ async def ask_question(
     db: Session = Depends(get_db)
 ):
     """
-    Poser une question sur les articles indexés
-    TODO: Implémenter le pipeline RAG complet
+    Ask a question about indexed papers
+    TODO: Implement complete RAG pipeline
     """
-    # TODO: Implémenter
-    # 1. Vectoriser la question
-    # 2. Recherche vectorielle dans pgvector
-    # 3. Construire le contexte
-    # 4. Appel OpenAI pour génération
-    # 5. Logger la requête
-    # 6. Calculer le coût
+    # TODO: Implement
+    # 1. Vectorize the question
+    # 2. Vector search in pgvector
+    # 3. Build the context
+    # 4. Call OpenAI for generation
+    # 5. Log the query
+    # 6. Calculate the cost
 
-    raise HTTPException(status_code=501, detail="À implémenter")
+    raise HTTPException(status_code=501, detail="To be implemented")

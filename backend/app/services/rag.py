@@ -1,6 +1,6 @@
 """
-Service RAG (Retrieval-Augmented Generation)
-TODO: Implémenter le pipeline complet avec Mammouth AI
+RAG (Retrieval-Augmented Generation) service
+TODO: Implement complete pipeline with Mammouth AI
 """
 from typing import Dict, Any
 from app.config import settings
@@ -12,46 +12,46 @@ async def generate_rag_answer(
     paper_ids: list = None
 ) -> Dict[str, Any]:
     """
-    Pipeline RAG complet pour répondre à une question
+    Complete RAG pipeline to answer a question
 
     Args:
-        question: Question de l'utilisateur
-        max_sources: Nombre maximum de sources à utiliser
-        paper_ids: IDs de papers pour filtrer la recherche
+        question: User's question
+        max_sources: Maximum number of sources to use
+        paper_ids: Paper IDs to filter the search
 
     Returns:
-        Dict avec answer, sources, cost_usd, response_time_ms
+        Dict with answer, sources, cost_usd, response_time_ms
     """
-    # TODO: Implémenter le pipeline RAG
-    # 1. Vectoriser la question (avec embeddings service)
-    # 2. Recherche vectorielle (avec vector_store service)
-    # 3. Construire le contexte
-    # 4. Appel Mammouth AI pour génération
-    # Exemple:
+    # TODO: Implement the RAG pipeline
+    # 1. Vectorize the question (with embeddings service)
+    # 2. Vector search (with vector_store service)
+    # 3. Build the context
+    # 4. Call Mammouth AI for generation
+    # Example:
     # from openai import OpenAI
     # client = OpenAI(api_key=settings.OPENAI_API_KEY, base_url=settings.OPENAI_API_BASE)
     # response = client.chat.completions.create(model="gpt-4o-mini", messages=[...])
-    # 5. Calculer le coût
-    raise NotImplementedError("À implémenter le pipeline RAG")
+    # 5. Calculate the cost
+    raise NotImplementedError("To be implemented RAG pipeline")
 
 
 def calculate_cost(prompt_tokens: int, completion_tokens: int) -> float:
     """
-    Calcule le coût d'une requête LLM via Mammouth AI
+    Calculates the cost of an LLM request via Mammouth AI
 
     Args:
-        prompt_tokens: Nombre de tokens en entrée
-        completion_tokens: Nombre de tokens en sortie
+        prompt_tokens: Number of input tokens
+        completion_tokens: Number of output tokens
 
     Returns:
-        Coût en USD
+        Cost in USD
     """
-    # Tarifs Mammouth AI (équivalents OpenAI - Janvier 2025)
-    # Vérifier les tarifs réels sur https://mammouth.ai
+    # Mammouth AI pricing (OpenAI equivalents - January 2025)
+    # Verify actual pricing at https://mammouth.ai
     PRICING = {
         "gpt-4o-mini": {
-            "input": 0.00015,  # par 1K tokens
-            "output": 0.0006   # par 1K tokens
+            "input": 0.00015,  # per 1K tokens
+            "output": 0.0006   # per 1K tokens
         }
     }
 
