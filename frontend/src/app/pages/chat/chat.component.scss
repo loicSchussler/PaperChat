@@ -32,6 +32,26 @@
     border-radius: 4px;
     margin-bottom: 20px;
     line-height: 1.6;
+    white-space: pre-wrap;
+  }
+
+  .metadata {
+    margin: 15px 0;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+
+    mat-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
   }
 
   .sources-section {

@@ -19,31 +19,24 @@ export class DashboardPageComponent implements OnInit {
   loadStats() {
     this.loading = true;
 
-    // TODO: Uncomment when the backend is ready
-    /*
     this.apiService.getStats().subscribe({
       next: (stats) => {
         this.stats = stats;
         this.loading = false;
       },
-      error: (error) => {
-        console.error('Error loading stats:', error);
+      error: (err) => {
+        console.error('Error loading stats:', err);
         this.loading = false;
+        // Show default stats on error
+        this.stats = {
+          total_papers: 0,
+          total_chunks: 0,
+          total_queries: 0,
+          total_cost_usd: 0,
+          avg_response_time_ms: 0,
+          queries_today: 0
+        };
       }
     });
-    */
-
-    // Mock data
-    setTimeout(() => {
-      this.stats = {
-        total_papers: 0,
-        total_chunks: 0,
-        total_queries: 0,
-        total_cost_usd: 0,
-        avg_response_time_ms: 0,
-        queries_today: 0
-      };
-      this.loading = false;
-    }, 500);
   }
 }

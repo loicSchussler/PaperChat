@@ -13,6 +13,8 @@ export class ChatPageComponent {
   sources: any[] = [];
   loading = false;
   error: string | null = null;
+  costUsd: number | null = null;
+  responseTimeMs: number | null = null;
 
   constructor(private apiService: ApiService) {}
 
@@ -20,7 +22,7 @@ export class ChatPageComponent {
     const question = this.questionControl.value?.trim();
 
     if (!question) {
-      this.error = 'Please enter a question';
+      this.error = 'Veuillez entrer une question';
       return;
     }
 
@@ -28,28 +30,22 @@ export class ChatPageComponent {
     this.error = null;
     this.answer = null;
     this.sources = [];
+    this.costUsd = null;
+    this.responseTimeMs = null;
 
-    // TODO: Uncomment when the backend is ready
-    console.log('Question:', question);
-
-    // Simulation for now
-    setTimeout(() => {
-      this.answer = 'The backend is not yet implemented. Please code the RAG logic!';
-      this.loading = false;
-    }, 1000);
-
-    /*
     this.apiService.askQuestion({ question }).subscribe({
       next: (response) => {
         this.answer = response.answer;
         this.sources = response.sources;
+        this.costUsd = response.cost_usd;
+        this.responseTimeMs = response.response_time_ms;
         this.loading = false;
       },
-      error: (error) => {
-        this.error = error.message || 'Error during request';
+      error: (err) => {
+        console.error('Error during chat request:', err);
+        this.error = err.error?.detail || err.message || 'Erreur lors de la requête';
         this.loading = false;
       }
     });
-    */
   }
 }

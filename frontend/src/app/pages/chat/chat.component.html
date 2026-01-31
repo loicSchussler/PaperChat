@@ -40,6 +40,23 @@
         {{ answer }}
       </div>
 
+      <div class="metadata" *ngIf="costUsd !== null || responseTimeMs !== null">
+        <mat-chip-set aria-label="Metadata">
+          <mat-chip *ngIf="responseTimeMs !== null">
+            <mat-icon>schedule</mat-icon>
+            {{ responseTimeMs }}ms
+          </mat-chip>
+          <mat-chip *ngIf="costUsd !== null">
+            <mat-icon>attach_money</mat-icon>
+            ${{ costUsd.toFixed(6) }}
+          </mat-chip>
+          <mat-chip *ngIf="sources.length > 0">
+            <mat-icon>source</mat-icon>
+            {{ sources.length }} source(s)
+          </mat-chip>
+        </mat-chip-set>
+      </div>
+
       <div *ngIf="sources.length > 0" class="sources-section">
         <h3>Sources:</h3>
         <mat-card *ngFor="let source of sources; let i = index" class="source-card">
