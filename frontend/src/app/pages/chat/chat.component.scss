@@ -141,6 +141,10 @@
     border-bottom: 1px solid #e0e0e0;
     background: white;
 
+    .mobile-only-button {
+      display: none;
+    }
+
     h2 {
       margin: 0;
       font-size: 18px;
@@ -399,6 +403,12 @@
   }
 
   .chat-main {
+    .chat-header {
+      .mobile-only-button {
+        display: inline-flex;
+      }
+    }
+
     .messages-container {
       .message {
         &.user .message-content,

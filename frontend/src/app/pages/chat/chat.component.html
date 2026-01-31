@@ -39,7 +39,7 @@
   <div class="chat-main" (click)="closeConversationListOnMobile()">
     <!-- Header -->
     <div class="chat-header">
-      <button mat-icon-button (click)="toggleConversationList(); $event.stopPropagation()">
+      <button mat-icon-button class="mobile-only-button" (click)="toggleConversationList(); $event.stopPropagation()">
         <mat-icon>menu</mat-icon>
       </button>
       <h2>

@@ -59,9 +59,13 @@ export class ChatPageComponent implements OnInit {
     this.error = null;
 
     // Hide conversation list on mobile to show we're in a new conversation
-    if (window.innerWidth <= 768) {
+    if (this.isMobile()) {
       this.showConversationList = false;
     }
+  }
+
+  isMobile(): boolean {
+    return window.innerWidth <= 768;
   }
 
   deleteConversation(conversationId: number, event: Event) {
@@ -142,12 +146,15 @@ export class ChatPageComponent implements OnInit {
   }
 
   toggleConversationList() {
-    this.showConversationList = !this.showConversationList;
+    // Only toggle on mobile, keep sidebar always visible on desktop
+    if (this.isMobile()) {
+      this.showConversationList = !this.showConversationList;
+    }
   }
 
   closeConversationListOnMobile() {
     // Close sidebar on mobile when clicking on main chat area
-    if (window.innerWidth <= 768 && this.showConversationList) {
+    if (this.isMobile() && this.showConversationList) {
       this.showConversationList = false;
     }
   }
