@@ -51,7 +51,6 @@ Paper text (may contain formatting artifacts):
 Return ONLY the JSON object, no other text:"""
 
     try:
-        logger.info(f"Extracting metadata from {len(text)} characters of text")
 
         response = await client.chat.completions.create(
             model=settings.OPENAI_CHAT_MODEL,
@@ -65,7 +64,6 @@ Return ONLY the JSON object, no other text:"""
 
         # Parse the response
         content = response.choices[0].message.content.strip()
-        logger.info(f"API response: {content[:200]}...")
 
         # Remove markdown code blocks if present
         if content.startswith("```"):
@@ -75,8 +73,6 @@ Return ONLY the JSON object, no other text:"""
             content = content.strip()
 
         metadata = json.loads(content)
-
-        logger.info(f"Extracted metadata - Title: {metadata.get('title', 'NOT FOUND')}")
 
         # Ensure all required fields are present
         result = {

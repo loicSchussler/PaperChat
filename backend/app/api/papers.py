@@ -66,21 +66,9 @@ async def upload_paper(
             )
 
         # Step 2: Extract metadata from text
-        logger.info(f"📄 Processing PDF: {file.filename}")
-        logger.info(f"📝 Extracted {len(extracted_text)} characters from PDF")
-        logger.info(f"📋 First 500 chars: {extracted_text[:500]}")
-
         text_preview = extracted_text[:3000]
-        logger.info(f"🤖 Calling LLM for metadata extraction with {len(text_preview)} characters")
 
         metadata = await extract_metadata_from_text(text_preview)
-
-        logger.info(f"✅ Metadata extraction completed")
-        logger.info(f"   - Title: {metadata.get('title', 'NONE')}")
-        logger.info(f"   - Authors: {metadata.get('authors', [])}")
-        logger.info(f"   - Year: {metadata.get('year', 'NONE')}")
-        logger.info(f"   - Has Abstract: {bool(metadata.get('abstract'))}")
-        logger.info(f"   - Keywords: {metadata.get('keywords', [])}")
 
         if metadata.get('error'):
             logger.error(f"❌ Metadata extraction had error: {metadata['error']}")
