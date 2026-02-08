@@ -18,6 +18,10 @@ Assistant IA pour analyser, indexer et interroger des articles scientifiques ave
 - **Base de données**: PostgreSQL 15 avec pgvector
 - **LLM**: Mammouth AI (API compatible OpenAI)
 
+## Images
+<img width="500" height="500" alt="image" src="https://github.com/user-attachments/assets/60b6a072-7979-435b-bae6-59d5743fec68" />
+
+
 ## Prérequis
 
 - Docker & Docker Compose
