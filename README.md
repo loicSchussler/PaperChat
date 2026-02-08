@@ -20,6 +20,10 @@ Assistant IA pour analyser, indexer et interroger des articles scientifiques ave
 
 ## Images
 <img width="500" height="500" alt="image" src="https://github.com/user-attachments/assets/60b6a072-7979-435b-bae6-59d5743fec68" />
+<img width="500" height="500" alt="image" src="https://github.com/user-attachments/assets/d13aa071-00a8-4b78-bd72-1abdc0516414" />
+<img width="500" height="500" alt="image" src="https://github.com/user-attachments/assets/52bc06b4-45c6-41f1-89e5-c897a4d7520e" />
+
+
 
 
 ## Prérequis
